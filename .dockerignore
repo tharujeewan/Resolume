@@ -1,0 +1,33 @@
+# Ignore dependencies
+**/node_modules
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Ignore build directories
+**/dist
+dist/
+client/dist/
+server/dist/
+
+# Ignore uploads and cache
+uploads/
+**/uploads
+.cache/
+.npm/
+
+# Ignore Git
+.git/
+.gitignore
+.dockerignore
+
+# Ignore environment variables
+.env
+*.env
+server/.env
+client/.env
+
+# Ignore docs and scripts
+docs/
+deploy-ec2.sh
+README.md

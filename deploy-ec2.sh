@@ -78,6 +78,12 @@ echo "Starting multi-container Docker deployment..."
 # Run docker compose up with build flag
 sudo docker compose up -d --build
 
+echo "Waiting for database and server containers to initialize..."
+sleep 10
+
+echo "Seeding default roles, super admin, and settings..."
+sudo docker compose exec -T server npm run prisma:seed
+
 echo "============================================="
 echo "  EventWall is deploying in the background!  "
 echo "  Check container status: sudo docker ps     "
