@@ -3,6 +3,8 @@
     "prisma": "^5.22.0"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "^5.22.0",
+    "axios": "^1.7.9",
+    "socket.io-client": "^4.8.1"
   }
 }

@@ -1,0 +1,45 @@
+name: Deploy EventWall to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: SSH to EC2 and Run Deployment Script
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            echo "============================================="
+            echo "       Starting CI/CD Deploy on EC2          "
+            echo "============================================="
+            
+            # Navigate to application directory
+            cd ~/Resolume
+            
+            # Pull latest changes
+            echo "Pulling latest code from GitHub..."
+            git pull origin main
+            
+            # Make script executable
+            chmod +x deploy-ec2.sh
+            
+            # Run the EC2 deployment script
+            echo "Executing EC2 deployment..."
+            ./deploy-ec2.sh
+            
+            echo "============================================="
+            echo "       Deployment completed successfully!    "
+            echo "============================================="
