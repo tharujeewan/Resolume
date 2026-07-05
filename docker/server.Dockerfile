@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install build dependencies for compiling native node packages (like sharp)
-RUN apk add --no-cache python3 make g++ gcc libc6-compat
+RUN apk add --no-cache python3 make g++ gcc libc6-compat openssl
 
 # Copy package files from server directory
 COPY server/package*.json ./
@@ -12,8 +12,8 @@ COPY server/package*.json ./
 # Install packages
 RUN npm ci
 
-# Copy schema and generate client
-COPY prisma/schema.prisma ./prisma/schema.prisma
+# Copy prisma directory (schema and migrations) and generate client
+COPY prisma ./prisma
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Copy server code and build
@@ -30,8 +30,8 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Install runtime dependencies for sharp
-RUN apk add --no-cache libc6-compat
+# Install runtime dependencies for sharp and prisma engines
+RUN apk add --no-cache libc6-compat openssl
 
 ENV NODE_ENV=production
 ENV PORT=5000
@@ -45,5 +45,5 @@ COPY --from=builder /app/prisma ./prisma
 # Expose API port
 EXPOSE 5000
 
-# Start server and run migrations
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/index.js"]
+# Start server, run migrations, and seed
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=./prisma/schema.prisma && node dist/db/seed.js && node dist/index.js"]

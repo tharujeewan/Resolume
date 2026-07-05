@@ -160,7 +160,7 @@ export const Gallery: React.FC = () => {
                 className="aspect-square rounded-2xl overflow-hidden glass border border-slate-900 shadow-lg relative transform hover:scale-[1.02] transition-transform duration-300 animate-fade-in"
               >
                 <img
-                  src={`/${photo.optimizedFilename}`}
+                  src={`/uploads/${photo.optimizedFilename}`}
                   alt="Guest upload"
                   className="w-full h-full object-cover pointer-events-none"
                   loading="lazy"
@@ -181,7 +181,7 @@ export const Gallery: React.FC = () => {
             
             <div className="aspect-[4/3] max-h-[60vh] w-full rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-500/20 glass p-2 relative bg-slate-900/40">
               <img
-                src={`/${newPhotoOverlay.optimizedFilename}`}
+                src={`/uploads/${newPhotoOverlay.optimizedFilename}`}
                 alt="New photo display"
                 className="w-full h-full object-contain rounded-2xl"
               />

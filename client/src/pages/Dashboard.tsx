@@ -115,7 +115,7 @@ export const Dashboard: React.FC = () => {
                 <div key={activity.id} className="py-4 flex items-center justify-between gap-4 first:pt-0 last:pb-0">
                   <div className="flex items-center gap-3">
                     <img
-                      src={`/${activity.thumbnailFilename}`}
+                      src={`/uploads/${activity.thumbnailFilename}`}
                       alt={activity.originalName}
                       className="w-12 h-12 object-cover rounded-lg border border-slate-800/80 bg-slate-900"
                     />

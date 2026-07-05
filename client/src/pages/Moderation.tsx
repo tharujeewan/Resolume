@@ -244,7 +244,7 @@ export const Moderation: React.FC = () => {
                   }`}
                 >
                   <img
-                    src={`/${photo.thumbnailFilename}`}
+                    src={`/uploads/${photo.thumbnailFilename}`}
                     alt={photo.originalName}
                     className="w-full h-full object-cover select-none"
                   />
