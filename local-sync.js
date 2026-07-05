@@ -12,6 +12,13 @@ const ORGANIZER_EMAIL = process.argv[4] || 'organizer@eventwall.com';
 const ORGANIZER_PASSWORD = process.argv[5] || 'OrganizerSecurePassword2026!';
 const LOCAL_DIR = 'C:\\EventWall';
 
+// Resolume REST API Settings
+const RESOLUME_ENABLED = process.env.RESOLUME_ENABLED !== 'false'; // Defaults to true on laptop
+const RESOLUME_HOST = process.env.RESOLUME_HOST || 'localhost';
+const RESOLUME_PORT = process.env.RESOLUME_PORT || '8080';
+const RESOLUME_LAYER = parseInt(process.env.RESOLUME_LAYER || '1', 10);
+const RESOLUME_CLIP = parseInt(process.env.RESOLUME_CLIP || '1', 10);
+
 if (!EVENT_ID) {
   console.error('\x1b[31mError: Event ID is required.\x1b[0m');
   console.log('\nUsage:');
@@ -36,6 +43,99 @@ console.log('=============================================\n');
 
 let token = '';
 let socket = null;
+
+/**
+ * Format absolute file path to URL-encoded URI required by Resolume:
+ * e.g., C:\EventWall\file.jpg -> file:///C:/EventWall/file.jpg
+ */
+function formatFileUrl(absolutePath) {
+  let normalized = absolutePath.replace(/\\/g, '/');
+  if (!normalized.startsWith('file:///')) {
+    if (normalized.startsWith('/')) {
+      normalized = `file://${normalized}`;
+    } else {
+      normalized = `file:///${normalized}`;
+    }
+  }
+  const prefix = 'file:///';
+  const pathSegment = normalized.substring(prefix.length);
+  const encodedPath = pathSegment
+    .split('/')
+    .map(part => encodeURIComponent(part))
+    .join('/');
+  return `${prefix}${encodedPath}`;
+}
+
+/**
+ * Dynamically fetch Resolume Swagger description to discover schema requirements
+ * of the openfile endpoint (whether FileUrl is a plain string or a JSON object).
+ */
+async function detectFileUrlSchema(baseUrl) {
+  try {
+    const swaggerRes = await axios.get(`${baseUrl}/api/docs/rest/swagger.yaml`, {
+      timeout: 2000
+    });
+    const yaml = swaggerRes.data;
+    const fileUrlMatch = yaml.match(/FileUrl:[\s\S]*?(?=\n\w|\Z)/);
+    if (fileUrlMatch) {
+      const schemaText = fileUrlMatch[0];
+      if (schemaText.includes('type: object') || schemaText.includes('properties:')) {
+        if (schemaText.includes('url:')) {
+          return 'url_object';
+        } else if (schemaText.includes('path:')) {
+          return 'path_object';
+        }
+      }
+    }
+  } catch (e) {
+    // Default to string on failure
+  }
+  return 'string';
+}
+
+/**
+ * Connect to local Resolume REST API, load image file, and trigger playback
+ */
+async function triggerResolume(filename) {
+  if (!RESOLUME_ENABLED) return;
+
+  const absolutePath = path.join(LOCAL_DIR, filename);
+  const fileUrl = formatFileUrl(absolutePath);
+  const baseUrl = `http://${RESOLUME_HOST}:${RESOLUME_PORT}`;
+  const apiUrl = `${baseUrl}/api/v1`;
+
+  console.log(`[Resolume] Sending ${filename} to Resolume...`);
+
+  try {
+    // 1. Detect openfile body schema dynamically
+    const schemaType = await detectFileUrlSchema(baseUrl);
+    let body;
+    if (schemaType === 'url_object') {
+      body = { url: fileUrl };
+    } else if (schemaType === 'path_object') {
+      body = { path: fileUrl };
+    } else {
+      body = fileUrl; // Plain string raw payload
+    }
+
+    // 2. Load file into specified slot
+    const openEndpoint = `${apiUrl}/composition/layers/${RESOLUME_LAYER}/clips/${RESOLUME_CLIP}/openfile`;
+    await axios.post(openEndpoint, body, {
+      headers: {
+        'Content-Type': typeof body === 'object' ? 'application/json' : 'text/plain'
+      },
+      timeout: 3000
+    });
+    console.log(`[Resolume] Media loaded into Layer ${RESOLUME_LAYER}, Clip ${RESOLUME_CLIP}.`);
+
+    // 3. Trigger playback of the clip
+    const connectEndpoint = `${apiUrl}/composition/layers/${RESOLUME_LAYER}/clips/${RESOLUME_CLIP}/connect`;
+    await axios.post(connectEndpoint, {}, { timeout: 3000 });
+    console.log(`\x1b[35m[Resolume] Live display updated successfully!\x1b[0m`);
+  } catch (err) {
+    console.error(`\x1b[33m[Resolume Warning] Could not output to Resolume (is Resolume open with Webserver enabled?):\x1b[0m`, err.response?.data?.message || err.message);
+  }
+}
 
 // Download a single file
 async function downloadFile(relativeFilePath) {
@@ -67,7 +167,9 @@ async function downloadFile(relativeFilePath) {
     return new Promise((resolve, reject) => {
       writer.on('finish', () => {
         console.log(`\x1b[32m[Success] Saved to local folder: ${filename}\x1b[0m`);
-        resolve();
+        triggerResolume(filename)
+          .then(() => resolve())
+          .catch(() => resolve());
       });
       writer.on('error', (err) => {
         console.error(`\x1b[31m[Error] Saving file: ${filename}\x1b[0m`, err.message);

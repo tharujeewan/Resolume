@@ -2,8 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import { PhotoStatus, RoleName } from '@prisma/client';
 import prisma from '../db/prisma';
 import { ApiError } from '../middlewares/error';
+import path from 'path';
+import { config } from '../config';
+import { logger } from '../utils/logger';
 import imageService from '../services/image.service';
 import socketService from '../services/socket.service';
+import resolumeService from '../services/resolume.service';
 
 export const uploadPhoto = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -67,6 +71,21 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
     if (autoApprove) {
       const filename = processed.optimizedPath.split('/').pop() || '';
       await imageService.copyToResolume(event.id, filename, processed.optimizedPath);
+
+      // Load into Resolume (non-blocking background call)
+      if (config.resolume.enabled) {
+        const absolutePath = path.resolve(path.join(config.uploads.baseDir, processed.optimizedPath));
+        resolumeService.loadMedia(absolutePath)
+          .then(success => {
+            if (success) {
+              return resolumeService.triggerClip();
+            }
+          })
+          .catch(err => {
+            logger.error(`Resolume background processing failed: ${err.message}`);
+          });
+      }
+
       socketService.notifyPhotoApproved(event.id, photo);
       socketService.notifyPhotoUploaded(event.id, photo);
     } else {
@@ -169,6 +188,20 @@ export const updatePhotoStatus = async (req: Request, res: Response, next: NextF
       // Copy to Resolume watch folder
       if (photo.optimizedFilename) {
         await imageService.copyToResolume(photo.eventId, filename, photo.optimizedFilename);
+
+        // Load into Resolume (non-blocking background call)
+        if (config.resolume.enabled) {
+          const absolutePath = path.resolve(path.join(config.uploads.baseDir, photo.optimizedFilename));
+          resolumeService.loadMedia(absolutePath)
+            .then(success => {
+              if (success) {
+                return resolumeService.triggerClip();
+              }
+            })
+            .catch(err => {
+              logger.error(`Resolume background processing failed: ${err.message}`);
+            });
+        }
       }
       // Broadcast real-time approved event for display walls
       socketService.notifyPhotoApproved(photo.eventId, updatedPhoto);
@@ -238,6 +271,20 @@ export const bulkUpdatePhotoStatus = async (req: Request, res: Response, next: N
       if (status === PhotoStatus.APPROVED) {
         if (photo.optimizedFilename) {
           await imageService.copyToResolume(eventId, filename, photo.optimizedFilename);
+
+          // Load into Resolume (non-blocking background call)
+          if (config.resolume.enabled) {
+            const absolutePath = path.resolve(path.join(config.uploads.baseDir, photo.optimizedFilename));
+            resolumeService.loadMedia(absolutePath)
+              .then(success => {
+                if (success) {
+                  return resolumeService.triggerClip();
+                }
+              })
+              .catch(err => {
+                logger.error(`Resolume background processing failed: ${err.message}`);
+              });
+          }
         }
         // Emit Socket approval for each photo
         const updatedPhoto = { ...photo, status };

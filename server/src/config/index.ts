@@ -35,4 +35,11 @@ export const config = {
   cors: {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173', // Default Vite port
   },
+  resolume: {
+    enabled: process.env.RESOLUME_ENABLED === 'true',
+    host: process.env.RESOLUME_HOST || 'localhost',
+    port: parseInt(process.env.RESOLUME_PORT || '8080', 10),
+    layer: parseInt(process.env.RESOLUME_LAYER || '1', 10),
+    clip: parseInt(process.env.RESOLUME_CLIP || '1', 10),
+  },
 };
