@@ -67,8 +67,8 @@ export const Moderation: React.FC = () => {
   useSocket(eventId, 'moderation', {
     photo_uploaded: (newPhoto: Photo) => {
       console.log('Realtime photo uploaded:', newPhoto);
-      // Invalidate query to pull the latest list
-      queryClient.invalidateQueries({ queryKey: ['photos', eventId, 'PENDING'] });
+      // Invalidate query to pull the latest list across all tabs
+      queryClient.invalidateQueries({ queryKey: ['photos', eventId] });
       toast('info', `New photo uploaded: ${newPhoto.originalName}`);
     },
     photo_status_changed: (payload: { photoId: string; status: string }) => {

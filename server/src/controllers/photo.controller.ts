@@ -67,6 +67,7 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
       const filename = processed.optimizedPath.split('/').pop() || '';
       await imageService.copyToResolume(event.id, filename, processed.optimizedPath);
       socketService.notifyPhotoApproved(event.id, photo);
+      socketService.notifyPhotoUploaded(event.id, photo);
     } else {
       socketService.notifyPhotoUploaded(event.id, photo);
     }
