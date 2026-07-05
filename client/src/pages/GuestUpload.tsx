@@ -8,6 +8,60 @@ import { useToast } from '../components/Toast';
 import { Camera, Upload, CheckCircle2, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+const compressImage = (file: File): Promise<Blob | File> => {
+  return new Promise((resolve) => {
+    if (file.type === 'image/gif') {
+      return resolve(file);
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(file);
+
+        const MAX_SIZE = 1600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              resolve(file);
+            }
+          },
+          'image/jpeg',
+          0.8
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+};
+
 interface EventData {
   id: string;
   name: string;
@@ -54,7 +108,7 @@ export const GuestUpload: React.FC = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.webp', '.gif'],
+      'image/*': ['.jpeg', '.jpg', '.png', '.webp', '.gif', '.heic', '.heif'],
     },
     multiple: false,
   });
@@ -62,13 +116,15 @@ export const GuestUpload: React.FC = () => {
   const handleUpload = async () => {
     if (!selectedFile || !slug) return;
 
-    const formData = new FormData();
-    formData.append('image', selectedFile);
-    formData.append('eventSlug', slug);
-
     try {
       setUploadProgress(0);
-      
+      const compressedBlob = await compressImage(selectedFile);
+      const uploadFileName = selectedFile.name.replace(/\.(heic|heif)$/i, '.jpg');
+
+      const formData = new FormData();
+      formData.append('image', compressedBlob, uploadFileName);
+      formData.append('eventSlug', slug);
+
       await axios.post('/api/v1/photos/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -21,10 +21,33 @@ class ImageService {
   async processImage(
     buffer: Buffer,
     eventId: string,
-    originalFilename: string
+    originalFilename: string,
+    mimeType?: string
   ): Promise<ProcessedImageResult> {
+    let activeBuffer = buffer;
+    let activeFilename = originalFilename;
+
+    const isHeic = mimeType === 'image/heic' || mimeType === 'image/heif' ||
+                   originalFilename.toLowerCase().endsWith('.heic') ||
+                   originalFilename.toLowerCase().endsWith('.heif');
+
+    if (isHeic) {
+      try {
+        logger.info(`Converting HEIC/HEIF image to JPEG: ${originalFilename}`);
+        const heicConvert = require('heic-convert');
+        activeBuffer = await heicConvert({
+          buffer: buffer,
+          format: 'JPEG',
+          quality: 0.9,
+        });
+        activeFilename = originalFilename.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg');
+      } catch (err: any) {
+        logger.error(`Failed to convert HEIC/HEIF image to JPEG: ${err.message}`);
+      }
+    }
+
     const timestamp = Date.now();
-    const cleanFilename = originalFilename
+    const cleanFilename = activeFilename
       .replace(/[^a-zA-Z0-9.]/g, '_')
       .toLowerCase();
     const filename = `${timestamp}_${cleanFilename}`;
@@ -35,10 +58,10 @@ class ImageService {
 
     try {
       // 1. Save original image
-      await storageService.saveFile(originalRelativePath, buffer);
+      await storageService.saveFile(originalRelativePath, activeBuffer);
 
       // Get image metadata
-      const imageInstance = sharp(buffer);
+      const imageInstance = sharp(activeBuffer);
       const metadata = await imageInstance.metadata();
       const width = metadata.width || 0;
       const height = metadata.height || 0;

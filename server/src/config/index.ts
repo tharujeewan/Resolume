@@ -19,7 +19,7 @@ export const config = {
     // Save in root workspace dir /uploads
     baseDir: path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, '../../../../uploads')),
     maxSize: parseInt(process.env.MAX_FILE_SIZE || '10485760', 10), // 10MB in bytes
-    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'],
   },
   email: {
     smtp: {

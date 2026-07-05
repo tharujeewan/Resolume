@@ -41,7 +41,8 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
     const processed = await imageService.processImage(
       req.file.buffer,
       event.id,
-      req.file.originalname
+      req.file.originalname,
+      req.file.mimetype
     );
 
     const autoApprove = process.env.AUTO_APPROVE_PHOTOS === 'true';
