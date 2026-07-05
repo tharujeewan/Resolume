@@ -17,7 +17,9 @@ const RESOLUME_ENABLED = process.env.RESOLUME_ENABLED !== 'false'; // Defaults t
 const RESOLUME_HOST = process.env.RESOLUME_HOST || 'localhost';
 const RESOLUME_PORT = process.env.RESOLUME_PORT || '8080';
 const RESOLUME_LAYER = parseInt(process.env.RESOLUME_LAYER || '1', 10);
-const RESOLUME_CLIP = parseInt(process.env.RESOLUME_CLIP || '1', 10);
+const RESOLUME_START_CLIP = parseInt(process.env.RESOLUME_CLIP || '1', 10);
+const RESOLUME_MAX_CLIPS = parseInt(process.env.RESOLUME_MAX_CLIPS || '20', 10);
+let nextClipSlot = RESOLUME_START_CLIP;
 
 if (!EVENT_ID) {
   console.error('\x1b[31mError: Event ID is required.\x1b[0m');
@@ -104,7 +106,11 @@ async function triggerResolume(filename) {
   const baseUrl = `http://${RESOLUME_HOST}:${RESOLUME_PORT}`;
   const apiUrl = `${baseUrl}/api/v1`;
 
-  console.log(`[Resolume] Sending ${filename} to Resolume...`);
+  const targetSlot = nextClipSlot;
+  // Calculate next clip slot using the start offset and max clips wrapping formula
+  nextClipSlot = RESOLUME_START_CLIP + ((nextClipSlot - RESOLUME_START_CLIP + 1) % RESOLUME_MAX_CLIPS);
+
+  console.log(`[Resolume] Sending ${filename} to Resolume Slot ${targetSlot}...`);
 
   try {
     // 1. Detect openfile body schema dynamically
@@ -119,19 +125,19 @@ async function triggerResolume(filename) {
     }
 
     // 2. Load file into specified slot
-    const openEndpoint = `${apiUrl}/composition/layers/${RESOLUME_LAYER}/clips/${RESOLUME_CLIP}/openfile`;
+    const openEndpoint = `${apiUrl}/composition/layers/${RESOLUME_LAYER}/clips/${targetSlot}/openfile`;
     await axios.post(openEndpoint, body, {
       headers: {
         'Content-Type': typeof body === 'object' ? 'application/json' : 'text/plain'
       },
       timeout: 3000
     });
-    console.log(`[Resolume] Media loaded into Layer ${RESOLUME_LAYER}, Clip ${RESOLUME_CLIP}.`);
+    console.log(`[Resolume] Media loaded into Layer ${RESOLUME_LAYER}, Clip ${targetSlot}.`);
 
     // 3. Trigger playback of the clip
-    const connectEndpoint = `${apiUrl}/composition/layers/${RESOLUME_LAYER}/clips/${RESOLUME_CLIP}/connect`;
+    const connectEndpoint = `${apiUrl}/composition/layers/${RESOLUME_LAYER}/clips/${targetSlot}/connect`;
     await axios.post(connectEndpoint, {}, { timeout: 3000 });
-    console.log(`\x1b[35m[Resolume] Live display updated successfully!\x1b[0m`);
+    console.log(`\x1b[35m[Resolume] Live display updated successfully (Slot ${targetSlot})!\x1b[0m`);
   } catch (err) {
     console.error(`\x1b[33m[Resolume Warning] Could not output to Resolume (is Resolume open with Webserver enabled?):\x1b[0m`, err.response?.data?.message || err.message);
   }
@@ -145,6 +151,7 @@ async function downloadFile(relativeFilePath) {
   // Skip if file already exists
   if (fs.existsSync(localFilePath)) {
     console.log(`[Cache] Already downloaded: ${filename}`);
+    await triggerResolume(filename).catch(() => {});
     return;
   }
 
