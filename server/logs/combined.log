@@ -1,0 +1,65 @@
+[2026-07-05 09:00:33:033] [[32minfo[39m]: [32m=================================[39m
+[2026-07-05 09:00:33:033] [[32minfo[39m]: [32m  Server running in development mode[39m
+[2026-07-05 09:00:33:033] [[32minfo[39m]: [32m  Listening on port: 5000[39m
+[2026-07-05 09:00:33:033] [[32minfo[39m]: [32m  Uploads directory: C:\Users\jeewa\OneDrive\Desktop\Resol\uploads[39m
+[2026-07-05 09:00:33:033] [[32minfo[39m]: [32m=================================[39m
+[2026-07-05 09:02:08:28] [[31merror[39m]: [31mPOST /api/v1/events - 400 - body.name: Name must be at least 2 characters, body.slug: Slug must be at least 2 characters[39m
+[2026-07-05 09:02:08:28] [[31merror[39m]: [31mError: body.name: Name must be at least 2 characters, body.slug: Slug must be at least 2 characters[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\src\middlewares\validate.ts:22:12[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at next (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\route.js:149:13)[39m
+[31m    at Route.dispatch (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\route.js:119:3)[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:284:15[39m
+[31m    at router.process_params (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:346:12)[39m
+[31m    at next (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:280:10)[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\src\middlewares\auth.ts:56:5[39m
+[2026-07-05 09:02:17:217] [[32minfo[39m]: [32mSocket client connected: 7bkRL0N8lAN7wxUcAAAC[39m
+[2026-07-05 09:02:17:217] [[32minfo[39m]: [32mSocket 7bkRL0N8lAN7wxUcAAAC joined room event_20cbc56b-09ef-490f-b4b6-46a67625ac3b_moderation[39m
+[2026-07-05 09:02:21:221] [[32minfo[39m]: [32mSocket 7bkRL0N8lAN7wxUcAAAC left room event_20cbc56b-09ef-490f-b4b6-46a67625ac3b_moderation[39m
+[2026-07-05 09:02:21:221] [[32minfo[39m]: [32mSocket client disconnected: 7bkRL0N8lAN7wxUcAAAC[39m
+[2026-07-05 09:02:22:222] [[32minfo[39m]: [32mSocket client connected: kxN6x2SPjz1haOWcAAAF[39m
+[2026-07-05 09:02:22:222] [[32minfo[39m]: [32mSocket kxN6x2SPjz1haOWcAAAF joined room event_20cbc56b-09ef-490f-b4b6-46a67625ac3b[39m
+[2026-07-05 09:02:32:232] [[31merror[39m]: [31mGET /api/v1/events/20cbc56b-09ef-490f-b4b6-46a67625ac3b/qr?format=png - 401 - Please authenticate[39m
+[2026-07-05 09:02:32:232] [[31merror[39m]: [31mError: Please authenticate[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\src\middlewares\auth.ts:22:13[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at trim_prefix (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:328:13)[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:286:9[39m
+[31m    at router.process_params (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:346:12)[39m
+[31m    at next (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:280:10)[39m
+[31m    at router.handle (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:175:3)[39m
+[31m    at router (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:47:12)[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at trim_prefix (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:328:13)[39m
+[2026-07-05 09:02:39:239] [[31merror[39m]: [31mGET /api/v1/events/20cbc56b-09ef-490f-b4b6-46a67625ac3b/qr?format=pdf - 401 - Please authenticate[39m
+[2026-07-05 09:02:39:239] [[31merror[39m]: [31mError: Please authenticate[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\src\middlewares\auth.ts:22:13[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at trim_prefix (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:328:13)[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:286:9[39m
+[31m    at router.process_params (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:346:12)[39m
+[31m    at next (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:280:10)[39m
+[31m    at router.handle (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:175:3)[39m
+[31m    at router (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:47:12)[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at trim_prefix (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:328:13)[39m
+[2026-07-05 09:02:42:242] [[31merror[39m]: [31mGET /api/v1/events/20cbc56b-09ef-490f-b4b6-46a67625ac3b/qr?format=png - 401 - Please authenticate[39m
+[2026-07-05 09:02:42:242] [[31merror[39m]: [31mError: Please authenticate[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\src\middlewares\auth.ts:22:13[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at trim_prefix (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:328:13)[39m
+[31m    at C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:286:9[39m
+[31m    at router.process_params (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:346:12)[39m
+[31m    at next (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:280:10)[39m
+[31m    at router.handle (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:175:3)[39m
+[31m    at router (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:47:12)[39m
+[31m    at Layer.handle [as handle_request] (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\layer.js:95:5)[39m
+[31m    at trim_prefix (C:\Users\jeewa\OneDrive\Desktop\Resol\server\node_modules\express\lib\router\index.js:328:13)[39m
+[2026-07-05 09:06:09:69] [[32minfo[39m]: [32m=================================[39m
+[2026-07-05 09:06:09:69] [[32minfo[39m]: [32m  Server running in development mode[39m
+[2026-07-05 09:06:09:69] [[32minfo[39m]: [32m  Listening on port: 5000[39m
+[2026-07-05 09:06:09:69] [[32minfo[39m]: [32m  Uploads directory: C:\Users\jeewa\OneDrive\Desktop\Resol\uploads[39m
+[2026-07-05 09:06:09:69] [[32minfo[39m]: [32m=================================[39m
+[2026-07-05 09:06:09:69] [[32minfo[39m]: [32mSocket client connected: lZGO9kJsaekVmUZ-AAAB[39m
+[2026-07-05 09:06:09:69] [[32minfo[39m]: [32mSocket lZGO9kJsaekVmUZ-AAAB joined room event_20cbc56b-09ef-490f-b4b6-46a67625ac3b[39m
