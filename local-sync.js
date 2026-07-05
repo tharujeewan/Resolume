@@ -104,7 +104,7 @@ async function start() {
       password: ORGANIZER_PASSWORD
     });
     
-    token = loginRes.data.tokens.access.token;
+    token = loginRes.data.accessToken;
     console.log('\x1b[32m[Auth] Authenticated successfully.\x1b[0m');
 
     // 2. Catch up on already approved photos
