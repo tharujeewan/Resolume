@@ -44,6 +44,8 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
       req.file.originalname
     );
 
+    const autoApprove = process.env.AUTO_APPROVE_PHOTOS === 'true';
+
     // Save metadata to database
     const photo = await prisma.photo.create({
       data: {
@@ -57,15 +59,22 @@ export const uploadPhoto = async (req: Request, res: Response, next: NextFunctio
         height: processed.height,
         mimeType: req.file.mimetype,
         uploadedBy: req.ip,
-        status: PhotoStatus.PENDING, // Default is pending moderation
+        status: autoApprove ? PhotoStatus.APPROVED : PhotoStatus.PENDING,
       },
     });
 
-    // Notify organizers instantly in real-time
-    socketService.notifyPhotoUploaded(event.id, photo);
+    if (autoApprove) {
+      const filename = processed.optimizedPath.split('/').pop() || '';
+      await imageService.copyToResolume(event.id, filename, processed.optimizedPath);
+      socketService.notifyPhotoApproved(event.id, photo);
+    } else {
+      socketService.notifyPhotoUploaded(event.id, photo);
+    }
 
     res.status(201).json({
-      message: 'Photo uploaded successfully and is pending moderation.',
+      message: autoApprove
+        ? 'Photo uploaded and approved successfully.'
+        : 'Photo uploaded successfully and is pending moderation.',
       photo,
     });
   } catch (error) {

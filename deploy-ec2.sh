@@ -69,6 +69,7 @@ MAX_FILE_SIZE=10485760
 # REPLACE WITH YOUR EC2 PUBLIC IP OR DOMAIN NAME
 PUBLIC_DOMAIN="http://YOUR_EC2_PUBLIC_IP"
 CORS_ORIGIN="http://YOUR_EC2_PUBLIC_IP"
+AUTO_APPROVE_PHOTOS=true
 EOT
   echo "A default .env file was created. IMPORTANT: Please edit .env and update PUBLIC_DOMAIN with your EC2 public IP/domain."
 fi
